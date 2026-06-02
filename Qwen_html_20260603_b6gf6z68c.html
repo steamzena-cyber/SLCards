@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SL Cards</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #121212;
+            --bg-tertiary: #1a1a1a;
+            --bg-hover: #222;
+            --border-color: rgba(255,255,255,0.1);
+            --border-hover: rgba(255,255,255,0.3);
+            --text-primary: #fff;
+            --text-secondary: rgba(255,255,255,0.7);
+            --text-muted: rgba(255,255,255,0.4);
+            --accent: #fff;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #ff4444;
+            --info: #2196F3;
+        }
+
+        .light-theme {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #fff;
+            --bg-tertiary: #eee;
+            --bg-hover: #e5e5e5;
+            --border-color: rgba(0,0,0,0.1);
+            --border-hover: rgba(0,0,0,0.3);
+            --text-primary: #0a0a0a;
+            --text-secondary: rgba(0,0,0,0.7);
+            --text-muted: rgba(0,0,0,0.4);
+            --accent: #0a0a0a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .grid {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(var(--border-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px; height: 3px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0;
+            box-shadow: 0 0 10px var(--accent);
+            animation: float 20s infinite;
+        }
+
+        @keyframes float {
+            0% { opacity: 0; transform: translateY(100vh) scale(0); }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { opacity: 0; transform: translateY(-100vh) scale(1.5); }
+        }
+
+        /* ===== NAV ===== */
+        nav {
+            position: fixed;
+            top: 0; width: 100%;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10,10,10,0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+        }
+
+        .light-theme nav { background: rgba(245,245,245,0.95); }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            cursor: pointer;
+        }
+
+        .nav-links { display: flex; gap: 8px; align-items: center; }
+
+        .nav-links button {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .nav-links button:hover { color: var(--text-primary); }
+        .nav-links button.active { color: var(--accent); background: var(--bg-tertiary); }
+
+        .theme-toggle {
+            width: 44px; height: 24px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .theme-toggle::after {
+            content: '';
+            position: absolute;
+            width: 18px; height: 18px;
+            background: var(--accent);
+            border-radius: 50%;
+            top: 2px; left: 2px;
+            transition: all 0.3s;
+        }
+
+        .light-theme .theme-toggle::after { left: 22px; }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 80px 20px 40px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .section { display: none; animation: fadeIn 0.4s; }
+        .section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header { text-align: center; margin-bottom: 40px; }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: 6px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 15px;
+            letter-spacing: 1px;
+        }
+
+        /* ===== SET PILLS ===== */
+        .set-selector {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .set-wrapper { position: relative; display: inline-block; }
+
+        .set-pill {
+            padding: 14px 28px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 40px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            user-select: none;
+        }
+
+        .set-pill:hover {
+            transform: translateY(-3px);
+            border-color: var(--border-hover);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+
+        .set-pill.active {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: var(--accent);
+            box-shadow: 0 0 30px rgba(255,255,255,0.3);
+            font-weight: 700;
+        }
+
+        .set-action {
+            position: absolute;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            border: 2px solid var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 13px;
+            color: white;
+            font-weight: bold;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .set-wrapper:hover .set-action,
+        .set-wrapper.touch-active .set-action { opacity: 1; }
+
+        .set-action.download {
+            top: -10px; left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+        }
+
+        .set-action.delete {
+            top: -10px; right: -5px;
+            background: var(--danger);
+        }
+
+        .set-action:hover { transform: scale(1.15); }
+
+        /* ===== FLASH CARD ===== */
+        .flash-card {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 600px;
+            height: 380px;
+            margin: 30px auto;
+            cursor: pointer;
+        }
+
+        .flash-card-inner {
+            width: 100%; height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .flash-card.flipped .flash-card-inner { transform: rotateY(180deg); }
+
+        .flash-card-face {
+            position: absolute;
+            width: 100%; height: 100%;
+            backface-visibility: hidden;
+            border-radius: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 30px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-secondary);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .flash-card-back {
+            transform: rotateY(180deg);
+            background: rgba(30,30,30,0.95);
+        }
+
+        .light-theme .flash-card-back { background: rgba(240,240,240,0.95); }
+
+        .flash-label {
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+
+        .flash-text {
+            font-size: 26px;
+            line-height: 1.4;
+            text-align: center;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .flash-hint {
+            position: absolute;
+            bottom: 25px;
+            font-size: 11px;
+            color: var(--text-muted);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        .flash-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 12px 24px;
+            border-radius: 25px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .control-btn:hover { transform: translateY(-2px); }
+        .control-btn.correct { border-color: var(--success); color: var(--success); }
+        .control-btn.correct:hover { background: var(--success); color: white; }
+        .control-btn.wrong { border-color: var(--danger); color: var(--danger); }
+        .control-btn.wrong:hover { background: var(--danger); color: white; }
+
+        .counter {
+            text-align: center;
+            color: var(--text-secondary);
+            margin: 15px 0;
+            font-size: 15px;
+            letter-spacing: 1px;
+        }
+
+        /* ===== LIBRARY GRID ===== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 25px;
+        }
+
+        .card-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 22px;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: cardAppear 0.4s ease;
+        }
+
+        @keyframes cardAppear {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .card-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--border-hover);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .card-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .card-item-title { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+        .card-item-category { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
+        .card-item-count {
+            background: var(--bg-tertiary);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+
+        .card-item-desc {
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .card-item-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
+        .tag {
+            padding: 3px 8px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .card-item-actions { display: flex; gap: 8px; }
+
+        .card-btn {
+            flex: 1;
+            padding: 9px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .card-btn:hover { background: var(--bg-tertiary); }
+        .card-btn.primary { background: var(--accent); color: var(--bg-primary); border-color: var(--accent); }
+
+        /* ===== DAILY GOAL ===== */
+        .daily-goal {
+            background: linear-gradient(135deg, rgba(76,175,80,0.1), rgba(33,150,243,0.1));
+            border: 1px solid var(--success);
+            border-radius: 18px;
+            padding: 20px 25px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .daily-goal-info h3 { font-size: 18px; margin-bottom: 6px; }
+        .daily-goal-info p { color: var(--text-secondary); font-size: 13px; }
+
+        .goal-setting { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+
+        .goal-input {
+            width: 70px;
+            padding: 7px 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .goal-btn {
+            padding: 7px 14px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .progress-ring { width: 60px; height: 60px; position: relative; }
+        .progress-ring svg { transform: rotate(-90deg); }
+        .progress-ring circle { fill: none; stroke-width: 4; }
+        .progress-ring .bg { stroke: var(--bg-tertiary); }
+        .progress-ring .fg { stroke: var(--success); stroke-linecap: round; transition: stroke-dashoffset 0.5s; }
+        .progress-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* ===== SEARCH ===== */
+        .search-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 20px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-input:focus { border-color: var(--border-hover); }
+
+        .filter-select {
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            color: var(--text-primary);
+            font-size: 13px;
+            outline: none;
+        }
+
+        /* ===== UPLOAD ===== */
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 18px;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--bg-secondary);
+        }
+
+        .upload-area:hover { border-color: var(--border-hover); }
+        .upload-icon { font-size: 40px; margin-bottom: 10px; }
+        .upload-text { color: var(--text-secondary); font-size: 14px; }
+        .upload-hint { color: var(--text-muted); font-size: 11px; margin-top: 5px; }
+
+        /* ===== MATCH ===== */
+        .match-container { max-width: 800px; margin: 0 auto; }
+
+        .match-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .match-card {
+            padding: 20px 12px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            user-select: none;
+        }
+
+        .match-card:hover:not(.matched):not(.selected) { transform: translateY(-3px); }
+        .match-card.selected { border-color: var(--info); background: rgba(33,150,243,0.2); }
+        .match-card.matched { border-color: var(--success); background: rgba(76,175,80,0.2); opacity: 0.6; }
+        .match-card.wrong { border-color: var(--danger); animation: shake 0.4s; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .match-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .match-stat { text-align: center; }
+        .match-stat-value { font-size: 28px; font-weight: bold; color: var(--accent); }
+        .match-stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-top: 4px; }
+
+        /* ===== SURVIVAL ===== */
+        .survival-container { max-width: 700px; margin: 0 auto; }
+
+        .survival-hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 18px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .lives-display { display: flex; gap: 6px; font-size: 24px; }
+        .heart { animation: heartBeat 1s infinite; }
+        .heart.lost { opacity: 0.2; animation: none; filter: grayscale(1); }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .level-number { font-size: 30px; font-weight: bold; color: var(--warning); }
+        .level-label, .streak-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+        .streak-number { font-size: 30px; font-weight: bold; color: var(--success); }
+
+        .survival-card {
+            perspective: 1000px;
+            width: 100%;
+            height: 350px;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+
+        .survival-card-inner {
+            width: 100%; height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+
+        .survival-card.flipped .survival-card-inner { transform: rotateY(180deg); }
+
+        .survival-card-face {
+            position: absolute;
+            width: 100%; height: 100%;
+            backface-visibility: hidden;
+            border-radius: 22px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+
+        .survival-card-back { transform: rotateY(180deg); background: rgba(30,30,30,0.95); }
+
+        .survival-text { font-size: 24px; line-height: 1.4; text-align: center; word-break: break-word; }
+
+        .survival-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .survival-btn {
+            padding: 14px 30px;
+            border-radius: 25px;
+            border: 2px solid;
+            background: transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .survival-btn.correct { border-color: var(--success); color: var(--success); }
+        .survival-btn.correct:hover { background: var(--success); color: white; }
+        .survival-btn.wrong { border-color: var(--danger); color: var(--danger); }
+        .survival-btn.wrong:hover { background: var(--danger); color: white; }
+
+        .survival-gameover {
+            text-align: center;
+            padding: 35px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--danger);
+            border-radius: 22px;
+        }
+
+        .gameover-title { font-size: 40px; color: var(--danger); margin-bottom: 15px; }
+        .gameover-stat-value { font-size: 36px; font-weight: bold; color: var(--accent); }
+
+        /* ===== CREATE ===== */
+        .input {
+            width: 100%;
+            padding: 13px 18px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 15px;
+            outline: none;
+            margin-bottom: 12px;
+            font-family: inherit;
+        }
+
+        .input:focus { border-color: var(--border-hover); }
+        textarea.input { min-height: 100px; resize: vertical; }
+
+        .btn {
+            padding: 12px 22px;
+            border-radius: 25px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+        .btn.primary { background: var(--accent); color: var(--bg-primary); border-color: var(--accent); }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            padding: 20px;
+        }
+
+        .modal.active { display: flex; animation: fadeIn 0.3s; }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 22px;
+            padding: 30px;
+            max-width: 550px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-title { font-size: 22px; margin-bottom: 20px; text-align: center; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap; }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 20px; right: 20px;
+            padding: 14px 22px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            z-index: 3000;
+            animation: slideInRight 0.3s;
+            font-size: 14px;
+            max-width: 90vw;
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+
+        /* ===== MOBILE ADAPTIVE ===== */
+        @media (max-width: 768px) {
+            nav {
+                padding: 12px 15px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .logo { font-size: 20px; }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 6px;
+                width: 100%;
+                order: 3;
+            }
+
+            .nav-links button {
+                font-size: 11px;
+                padding: 7px 10px;
+            }
+
+            .container { padding: 130px 15px 30px; }
+
+            .header h1 {
+                font-size: 32px;
+                letter-spacing: 4px;
+            }
+
+            .subtitle { font-size: 13px; }
+
+            .set-pill {
+                padding: 11px 20px;
+                font-size: 13px;
+            }
+
+            .flash-card {
+                height: 320px;
+                margin: 20px auto;
+            }
+
+            .flash-text { font-size: 20px; }
+            .flash-card-face { padding: 30px 20px; }
+
+            .control-btn {
+                padding: 10px 18px;
+                font-size: 13px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .card-item { padding: 18px; }
+
+            .daily-goal {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .search-filter {
+                flex-direction: column;
+            }
+
+            .search-input, .filter-select {
+                width: 100%;
+            }
+
+            .match-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .match-card {
+                padding: 15px 10px;
+                font-size: 12px;
+                min-height: 75px;
+            }
+
+            .survival-hud {
+                justify-content: center;
+                text-align: center;
+            }
+
+            .survival-card { height: 300px; }
+            .survival-text { font-size: 20px; }
+
+            .survival-btn {
+                padding: 12px 24px;
+                font-size: 14px;
+            }
+
+            .gameover-title { font-size: 32px; }
+
+            .modal-content { padding: 25px 20px; }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 { font-size: 28px; }
+            .set-pill { padding: 10px 16px; font-size: 12px; }
+            .flash-card { height: 280px; }
+            .flash-text { font-size: 18px; }
+            .flash-controls { gap: 8px; }
+            .control-btn { padding: 9px 14px; font-size: 12px; }
+            .match-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid"></div>
+    <div class="particles" id="particles"></div>
+
+    <nav>
+        <div class="logo">SL Cards</div>
+        <div class="nav-links">
+            <button onclick="showSection('library')" id="libraryBtn" class="active">Библиотека</button>
+            <button onclick="showSection('flash')" id="flashBtn">Карточки</button>
+            <button onclick="showSection('match')" id="matchBtn">Пары</button>
+            <button onclick="showSection('survival')" id="survivalBtn">Выживание</button>
+            <button onclick="showSection('create')" id="createBtn">Создать</button>
+            <div class="theme-toggle" onclick="toggleTheme()"></div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- LIBRARY -->
+        <div id="librarySection" class="section active">
+            <div class="header">
+                <h1>БИБЛИОТЕКА</h1>
+                <div class="subtitle">Готовые наборы для обучения</div>
+            </div>
+
+            <div class="daily-goal">
+                <div class="daily-goal-info">
+                    <h3>🎯 Ежедневная цель</h3>
+                    <p>Установи свою цель</p>
+                    <div class="goal-setting">
+                        <input type="number" class="goal-input" id="goalInput" min="5" max="100" value="20">
+                        <button class="goal-btn" onclick="updateGoal()">Установить</button>
+                    </div>
+                </div>
+                <div class="progress-ring">
+                    <svg width="60" height="60">
+                        <circle class="bg" cx="30" cy="30" r="26"></circle>
+                        <circle class="fg" cx="30" cy="30" r="26" stroke-dasharray="163" stroke-dashoffset="163" id="progressCircle"></circle>
+                    </svg>
+                    <div class="progress-text" id="progressText">0/20</div>
+                </div>
+            </div>
+
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileUpload').click()">
+                <div class="upload-icon">📤</div>
+                <div class="upload-text">Нажми или перетащи файл</div>
+                <div class="upload-hint">JSON файлы с карточками</div>
+                <input type="file" id="fileUpload" accept=".json" style="display:none" onchange="handleFileUpload(event)">
+            </div>
+
+            <div class="search-filter">
+                <input type="text" class="search-input" id="searchInput" placeholder="🔍 Поиск...">
+                <select class="filter-select" id="categoryFilter">
+                    <option value="">Все категории</option>
+                    <option value="Программирование">Программирование</option>
+                    <option value="ОГЭ">ОГЭ</option>
+                    <option value="ЕГЭ">ЕГЭ</option>
+                    <option value="Школьные предметы">Школьные предметы</option>
+                    <option value="Иностранные языки">Иностранные языки</option>
+                    <option value="Пользовательские">Пользовательские</option>
+                </select>
+                <select class="filter-select" id="sortFilter">
+                    <option value="popular">По популярности</option>
+                    <option value="name">По названию</option>
+                    <option value="cards">По количеству</option>
+                </select>
+            </div>
+
+            <div class="cards-grid" id="libraryGrid"></div>
+        </div>
+
+        <!-- FLASH CARDS -->
+        <div id="flashSection" class="section">
+            <div class="header">
+                <h1>ФЛЕШ-КАРТОЧКИ</h1>
+                <div class="subtitle">Классический режим обучения</div>
+            </div>
+
+            <div class="set-selector" id="flashSetSelector"></div>
+
+            <div class="flash-card" id="flashCard" onclick="flipFlashCard()">
+                <div class="flash-card-inner">
+                    <div class="flash-card-face flash-card-front">
+                        <div class="flash-label">Вопрос</div>
+                        <div class="flash-text" id="flashFront">Выбери набор выше</div>
+                        <div class="flash-hint">Нажми для переворота</div>
+                    </div>
+                    <div class="flash-card-face flash-card-back">
+                        <div class="flash-label">Ответ</div>
+                        <div class="flash-text" id="flashBack"></div>
+                        <div class="flash-hint">Нажми чтобы вернуть</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="counter" id="flashCounter">0 / 0</div>
+
+            <div class="flash-controls">
+                <button class="control-btn" onclick="prevFlashCard()">← Назад</button>
+                <button class="control-btn wrong" onclick="rateCard('wrong')">✗ Не знаю</button>
+                <button class="control-btn correct" onclick="rateCard('correct')">✓ Знаю</button>
+                <button class="control-btn" onclick="nextFlashCard()">Вперёд →</button>
+            </div>
+        </div>
+
+        <!-- MATCH PAIRS -->
+        <div id="matchSection" class="section">
+            <div class="header">
+                <h1>ПАРНЫЕ КАРТОЧКИ</h1>
+                <div class="subtitle">Соедини вопросы с ответами</div>
+            </div>
+
+            <div class="match-container">
+                <div class="set-selector" id="matchSetSelector"></div>
+                <div style="text-align: center;">
+                    <button class="btn primary" onclick="initMatchGame()">🎮 Новая игра</button>
+                </div>
+
+                <div class="match-stats">
+                    <div class="match-stat"><div class="match-stat-value" id="matchPairs">0</div><div class="match-stat-label">Найдено пар</div></div>
+                    <div class="match-stat"><div class="match-stat-value" id="matchTime">0:00</div><div class="match-stat-label">Время</div></div>
+                    <div class="match-stat"><div class="match-stat-value" id="matchErrors">0</div><div class="match-stat-label">Ошибки</div></div>
+                </div>
+
+                <div class="match-grid" id="matchGrid"></div>
+            </div>
+        </div>
+
+        <!-- SURVIVAL -->
+        <div id="survivalSection" class="section">
+            <div class="header">
+                <h1>ВЫЖИВАНИЕ</h1>
+                <div class="subtitle">3 жизни. Каждая ошибка — потеря жизни.</div>
+            </div>
+
+            <div class="survival-container">
+                <div class="set-selector" id="survivalSetSelector"></div>
+                <div style="text-align: center;">
+                    <button class="btn primary" onclick="startSurvival()">💀 Начать игру</button>
+                </div>
+
+                <div id="survivalGameArea">
+                    <div style="text-align: center; padding: 50px 20px; color: var(--text-muted);">
+                        <div style="font-size: 70px; margin-bottom: 15px;"></div>
+                        <div style="font-size: 18px; margin-bottom: 10px;">Выбери набор и начни игру</div>
+                        <div style="font-size: 13px;">3 жизни • +1 за правильный ответ • Уровни каждые 10 очков</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CREATE -->
+        <div id="createSection" class="section">
+            <div class="header">
+                <h1>СОЗДАТЬ</h1>
+                <div class="subtitle">Создай свой набор и опубликуй</div>
+            </div>
+
+            <div style="max-width: 700px; margin: 0 auto;">
+                <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 22px; padding: 30px 25px;">
+                    <input type="text" class="input" id="newSetName" placeholder="Название набора">
+                    <select class="input" id="newSetCategory">
+                        <option value="Пользовательские">Пользовательские</option>
+                        <option value="Программирование">Программирование</option>
+                        <option value="ОГЭ">ОГЭ</option>
+                        <option value="ЕГЭ">ЕГЭ</option>
+                        <option value="Школьные предметы">Школьные предметы</option>
+                    </select>
+                    <input type="text" class="input" id="newSetTags" placeholder="Теги (через запятую)">
+                    <textarea class="input" id="newSetDesc" placeholder="Описание"></textarea>
+
+                    <div style="padding: 15px; background: var(--bg-tertiary); border-radius: 15px; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                            <span style="font-weight: 600;">Карточки</span>
+                            <button class="btn" onclick="addCardField()">+ Добавить</button>
+                        </div>
+                        <div id="cardsContainer"></div>
+                    </div>
+
+                    <button class="btn primary" style="width: 100%; padding: 14px;" onclick="createAndPublishSet()"> Опубликовать</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal" id="previewModal">
+        <div class="modal-content">
+            <div class="modal-title" id="previewTitle">Предпросмотр</div>
+            <div id="previewList" style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;"></div>
+            <div class="modal-actions">
+                <button class="btn" onclick="closeModal('previewModal')">Закрыть</button>
+                <button class="btn primary" id="addToLibBtn">Добавить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ БИБЛИОТЕКА ============
+        const baseLibrary = [
+            { id: 'py', title: 'Python - Основы', category: 'Программирование', desc: 'Базовый синтаксис', tags: ['Python'], cards: [
+                {front:'Как объявить переменную?', back:'x = 5'},
+                {front:'Что выведет print(type([]))?', back:"<class 'list'>"},
+                {front:'Как создать список?', back:'my_list = [1, 2, 3]'},
+                {front:'Как объявить функцию?', back:'def name():'},
+                {front:'Что делает range(5)?', back:'0, 1, 2, 3, 4'},
+                {front:'List comprehension', back:'[x**2 for x in range(10)]'}
+            ]},
+            { id: 'js', title: 'JavaScript - Основы', category: 'Программирование', desc: 'Переменные, функции, DOM', tags: ['JavaScript','Web'], cards: [
+                {front:'Как объявить переменную?', back:'let, const, var'},
+                {front:'typeof null?', back:'object'},
+                {front:'Что такое Promise?', back:'Асинхронные операции'},
+                {front:'Arrow function', back:'() => {}'},
+                {front:'Получить элемент по id', back:'document.getElementById()'},
+                {front:'Добавить обработчик', back:'addEventListener()'}
+            ]},
+            { id: 'htmlcss', title: 'HTML & CSS', category: 'Программирование', desc: 'Вёрстка, flexbox', tags: ['HTML','CSS'], cards: [
+                {front:'Flexbox', back:'display: flex'},
+                {front:'Центрировать', back:'margin: 0 auto или flexbox'},
+                {front:'Адаптив', back:'@media (max-width: 768px)'},
+                {front:'CSS Grid', back:'display: grid'},
+                {front:'Подключить CSS', back:'<link rel="stylesheet">'}
+            ]},
+            { id: 'sql', title: 'SQL - Основы', category: 'Программирование', desc: 'Запросы', tags: ['SQL','БД'], cards: [
+                {front:'Выбрать все', back:'SELECT * FROM table'},
+                {front:'WHERE', back:'Фильтр по условию'},
+                {front:'INNER JOIN', back:'Совпадения в обеих таблицах'},
+                {front:'ORDER BY', back:'Сортировка'},
+                {front:'COUNT()', back:'Количество записей'}
+            ]},
+            { id: 'git', title: 'Git - Команды', category: 'Программирование', desc: 'Основные команды', tags: ['Git'], cards: [
+                {front:'Создать репо', back:'git init'},
+                {front:'Клонировать', back:'git clone <url>'},
+                {front:'Коммит', back:'git commit -m "msg"'},
+                {front:'Отправить', back:'git push'},
+                {front:'Получить', back:'git pull'}
+            ]},
+            { id: 'oge-rus', title: 'ОГЭ - Русский', category: 'ОГЭ', desc: 'Правила', tags: ['ОГЭ'], cards: [
+                {front:'Когда НН?', back:'Суффиксы -онн-, -енн-'},
+                {front:'Причастие', back:'Признак по действию'},
+                {front:'Деепричастие', back:'Неизменяемая форма глагола'},
+                {front:'НЕ с глаголами', back:'Раздельно'}
+            ]},
+            { id: 'oge-math', title: 'ОГЭ - Математика', category: 'ОГЭ', desc: 'Алгебра, геометрия', tags: ['ОГЭ','Математика'], cards: [
+                {front:'Дискриминант', back:'D = b² - 4ac'},
+                {front:'Корни', back:'x = (-b ± √D) / 2a'},
+                {front:'Пифагор', back:'a² + b² = c²'},
+                {front:'Площадь круга', back:'S = πr²'},
+                {front:'Квадрат суммы', back:'(a+b)² = a² + 2ab + b²'}
+            ]},
+            { id: 'ege-math', title: 'ЕГЭ - Математика', category: 'ЕГЭ', desc: 'Производные', tags: ['ЕГЭ'], cards: [
+                {front:'Производная sin', back:'cos x'},
+                {front:'Производная eˣ', back:'eˣ'},
+                {front:'Производная ln', back:'1/x'},
+                {front:'Теорема Виета', back:'x₁+x₂=-b/a'}
+            ]},
+            { id: 'eng', title: 'English Grammar', category: 'Иностранные языки', desc: 'Времена', tags: ['English'], cards: [
+                {front:'Present Simple', back:'I work'},
+                {front:'Present Continuous', back:'I am working'},
+                {front:'Present Perfect', back:'I have worked'},
+                {front:'Passive Voice', back:'be + V3'}
+            ]},
+            { id: 'hist', title: 'История России', category: 'Школьные предметы', desc: 'Даты', tags: ['История'], cards: [
+                {front:'Крещение Руси', back:'988'},
+                {front:'Куликовская битва', back:'1380'},
+                {front:'Основание СПб', back:'1703'},
+                {front:'Отечественная война', back:'1812'},
+                {front:'Отмена крепостного права', back:'1861'},
+                {front:'Октябрьская революция', back:'1917'},
+                {front:'ВОВ', back:'1941-1945'},
+                {front:'Гагарин', back:'1961'}
+            ]},
+            { id: 'bio', title: 'Биология - Клетка', category: 'Школьные предметы', desc: 'Строение', tags: ['Биология'], cards: [
+                {front:'Митохондрии', back:'Синтез АТФ'},
+                {front:'Рибосомы', back:'Синтез белка'},
+                {front:'Хлоропласты', back:'Фотосинтез'},
+                {front:'Ядро', back:'Хранение ДНК'}
+            ]},
+            { id: 'phys', title: 'Физика - Формулы', category: 'Школьные предметы', desc: 'Основные формулы', tags: ['Физика'], cards: [
+                {front:'Закон Ома', back:'I = U/R'},
+                {front:'2-й закон Ньютона', back:'F = ma'},
+                {front:'Мощность', back:'P = A/t'},
+                {front:'Давление', back:'p = F/S'},
+                {front:'Импульс', back:'p = mv'}
+            ]},
+            { id: 'cpp', title: 'C++ - Основы', category: 'Программирование', desc: 'Основы C++', tags: ['C++'], cards: [
+                {front:'Включить iostream', back:'#include <iostream>'},
+                {front:'cout', back:'std::cout << "text"'},
+                {front:'Цикл for', back:'for(int i=0; i<n; i++)'},
+                {front:'Указатель', back:'int* ptr = &x'}
+            ]},
+            { id: 'java', title: 'Java - Основы', category: 'Программирование', desc: 'Основы Java', tags: ['Java'], cards: [
+                {front:'Главный метод', back:'public static void main(String[] args)'},
+                {front:'Вывод', back:'System.out.println()'},
+                {front:'Класс', back:'public class Name {}'},
+                {front:'Массив', back:'int[] arr = new int[5]'}
+            ]},
+            { id: 'c-lang', title: 'C - Основы', category: 'Программирование', desc: 'Основы C', tags: ['C'], cards: [
+                {front:'stdio.h', back:'#include <stdio.h>'},
+                {front:'printf', back:'printf("text")'},
+                {front:'scanf', back:'scanf("%d", &x)'},
+                {front:'malloc', back:'Выделение памяти'}
+            ]},
+            { id: 'csharp', title: 'C# - Основы', category: 'Программирование', desc: 'Основы C#', tags: ['C#'], cards: [
+                {front:'Вывод', back:'Console.WriteLine()'},
+                {front:'Класс', back:'class Name {}'},
+                {front:'Массив', back:'int[] arr = new int[5]'},
+                {front:'LINQ', back:'Запросы к коллекциям'}
+            ]}
+        ];
+
+        // ============ STATE ============
+        let library = [];
+        let userSets = {};
+        let currentFlashSet = null;
+        let currentFlashIndex = 0;
+        let currentSetName = null;
+        let selectedMatchSet = null;
+        let selectedSurvivalSet = null;
+        let dailyGoal = { target: 20, completed: 0, date: null };
+        let matchState = { cards: [], selected: null, matched: 0, errors: 0, timer: null, startTime: null };
+        let survivalState = { active: false, cards: [], lives: 3, maxLives: 3, score: 0, streak: 0, bestStreak: 0, level: 1 };
+
+        // ============ INIT ============
+        function init() {
+            createParticles();
+            loadLibrary();
+            loadUserSets();
+            loadDailyGoal();
+            renderAll();
+            setupDragDrop();
+            
+            document.getElementById('searchInput').addEventListener('input', debounce(renderLibrary, 300));
+            document.getElementById('categoryFilter').addEventListener('change', renderLibrary);
+            document.getElementById('sortFilter').addEventListener('change', renderLibrary);
+
+            if (localStorage.getItem('slCardsTheme') === 'light') document.body.classList.add('light-theme');
+        }
+
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 15; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDelay = Math.random() * 20 + 's';
+                p.style.animationDuration = (15 + Math.random() * 10) + 's';
+                container.appendChild(p);
+            }
+        }
+
+        function loadLibrary() {
+            const saved = localStorage.getItem('slCardsLibrary');
+            if (saved) library = JSON.parse(saved);
+            else { library = [...baseLibrary]; saveLibrary(); }
+        }
+
+        function saveLibrary() { localStorage.setItem('slCardsLibrary', JSON.stringify(library)); }
+
+        function loadUserSets() {
+            const saved = localStorage.getItem('slCardsUserSets');
+            if (saved) userSets = JSON.parse(saved);
+        }
+
+        function saveUserSets() { localStorage.setItem('slCardsUserSets', JSON.stringify(userSets)); }
+
+        function loadDailyGoal() {
+            const saved = localStorage.getItem('slCardsDailyGoal');
+            const today = new Date().toDateString();
+            if (saved) {
+                dailyGoal = JSON.parse(saved);
+                if (dailyGoal.date !== today) { dailyGoal.completed = 0; dailyGoal.date = today; }
+            } else {
+                dailyGoal = { target: 20, completed: 0, date: today };
+            }
+            document.getElementById('goalInput').value = dailyGoal.target;
+        }
+
+        function saveDailyGoal() { localStorage.setItem('slCardsDailyGoal', JSON.stringify(dailyGoal)); }
+
+        function updateGoal() {
+            const v = parseInt(document.getElementById('goalInput').value);
+            if (v < 5 || v > 100) { showToast('От 5 до 100', 'error'); return; }
+            dailyGoal.target = v;
+            saveDailyGoal();
+            updateDailyGoalUI();
+            showToast(`Цель: ${v} карточек`, 'success');
+        }
+
+        function updateDailyGoalUI() {
+            const text = document.getElementById('progressText');
+            const circle = document.getElementById('progressCircle');
+            if (text && circle) {
+                text.textContent = `${dailyGoal.completed}/${dailyGoal.target}`;
+                circle.style.strokeDashoffset = 163 - (Math.min(dailyGoal.completed/dailyGoal.target, 1) * 163);
+            }
+        }
+
+        function addToDailyGoal() {
+            dailyGoal.completed++;
+            saveDailyGoal();
+            updateDailyGoalUI();
+            if (dailyGoal.completed === dailyGoal.target) showToast('🎉 Цель дня выполнена!', 'success');
+        }
+
+        // ============ RENDER ALL ============
+        function renderAll() {
+            renderLibrary();
+            renderFlashSets();
+            renderMatchSets();
+            renderSurvivalSets();
+            updateDailyGoalUI();
+        }
+
+        // ============ LIBRARY ============
+        function renderLibrary() {
+            const grid = document.getElementById('libraryGrid');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+            const sort = document.getElementById('sortFilter').value;
+
+            let filtered = library.filter(s => {
+                const ms = !search || s.title.toLowerCase().includes(search) || (s.tags||[]).some(t => t.toLowerCase().includes(search));
+                const mc = !category || s.category === category;
+                return ms && mc;
+            });
+
+            if (sort === 'name') filtered.sort((a,b) => a.title.localeCompare(b.title));
+            else if (sort === 'cards') filtered.sort((a,b) => b.cards.length - a.cards.length);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:50px; color:var(--text-muted);">Ничего не найдено</div>';
+                return;
+            }
+
+            grid.innerHTML = filtered.map((s, i) => `
+                <div class="card-item" style="animation-delay:${i*0.05}s">
+                    <div class="card-item-header">
+                        <div>
+                            <div class="card-item-title">${s.title}</div>
+                            <div class="card-item-category">${s.category}</div>
+                        </div>
+                        <div class="card-item-count">${s.cards.length}</div>
+                    </div>
+                    <div class="card-item-desc">${s.desc||''}</div>
+                    <div class="card-item-tags">${(s.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+                    <div class="card-item-actions">
+                        <button class="card-btn" onclick="previewSet('${s.id}', event)">👁 Обзор</button>
+                        <button class="card-btn primary" onclick="addSetFromLibrary('${s.id}', event)">+ Добавить</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function previewSet(setId, event) {
+            if (event) event.stopPropagation();
+            const s = library.find(x => x.id === setId);
+            if (!s) return;
+            document.getElementById('previewTitle').textContent = s.title;
+            document.getElementById('previewList').innerHTML = s.cards.slice(0, 8).map((c,i)=>`
+                <div style="padding:12px; margin-bottom:8px; background:var(--bg-tertiary); border-radius:10px; border-left:3px solid var(--accent);">
+                    <div style="font-weight:600; margin-bottom:4px; font-size:14px;">${i+1}. ${c.front}</div>
+                    <div style="font-size:12px; color:var(--text-secondary);">${c.back}</div>
+                </div>
+            `).join('');
+            document.getElementById('addToLibBtn').onclick = () => { addSetFromLibrary(setId); closeModal('previewModal'); };
+            openModal('previewModal');
+        }
+
+        function addSetFromLibrary(setId, event) {
+            if (event) event.stopPropagation();
+            const s = library.find(x => x.id === setId);
+            if (!s) return;
+            if (userSets[s.title]) { showToast('Уже добавлен', 'info'); return; }
+            userSets[s.title] = s.cards.map(c => ({...c}));
+            saveUserSets();
+            renderAll();
+            showToast(`"${s.title}" добавлен`, 'success');
+        }
+
+        // ============ FLASH SETS ============
+        function renderFlashSets() {
+            const container = document.getElementById('flashSetSelector');
+            const names = Object.keys(userSets);
+            
+            if (names.length === 0) {
+                container.innerHTML = '<div style="color: var(--text-muted); text-align:center; padding: 20px;">Нет наборов. Добавь из библиотеки!</div>';
+                return;
+            }
+
+            container.innerHTML = names.map(name => {
+                const count = userSets[name].length;
+                const isActive = currentSetName === name ? 'active' : '';
+                return `
+                    <div class="set-wrapper" onclick="this.classList.toggle('touch-active')">
+                        <div class="set-pill ${isActive}" onclick="loadFlashSet('${escapeAttr(name)}')">${escapeHtml(name)} (${count})</div>
+                        <div class="set-action download" onclick="downloadSet('${escapeAttr(name)}', event)" title="Скачать">↓</div>
+                        <div class="set-action delete" onclick="deleteSet('${escapeAttr(name)}', event)" title="Удалить">×</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function loadFlashSet(name) {
+            if (!userSets[name]) return;
+            currentFlashSet = userSets[name].map(c => ({...c}));
+            currentFlashIndex = 0;
+            currentSetName = name;
+            showFlashCard();
+            renderFlashSets();
+        }
+
+        function showFlashCard() {
+            if (!currentFlashSet) return;
+            const c = currentFlashSet[currentFlashIndex];
+            document.getElementById('flashFront').textContent = c.front;
+            document.getElementById('flashBack').textContent = c.back;
+            document.getElementById('flashCounter').textContent = `${currentFlashIndex+1} / ${currentFlashSet.length}`;
+            document.getElementById('flashCard').classList.remove('flipped');
+        }
+
+        function flipFlashCard() {
+            if (!currentFlashSet) return;
+            document.getElementById('flashCard').classList.toggle('flipped');
+        }
+
+        function nextFlashCard() {
+            if (!currentFlashSet) return;
+            currentFlashIndex = (currentFlashIndex + 1) % currentFlashSet.length;
+            showFlashCard();
+        }
+
+        function prevFlashCard() {
+            if (!currentFlashSet) return;
+            currentFlashIndex = (currentFlashIndex - 1 + currentFlashSet.length) % currentFlashSet.length;
+            showFlashCard();
+        }
+
+        function rateCard(r) {
+            if (!currentFlashSet) return;
+            if (r === 'correct') addToDailyGoal();
+            nextFlashCard();
+        }
+
+        function downloadSet(name, event) {
+            if (event) event.stopPropagation();
+            const data = { name, cards: userSets[name] };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${name.replace(/\s+/g,'_')}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(`💾 "${name}" скачан`, 'success');
+        }
+
+        function deleteSet(name, event) {
+            if (event) event.stopPropagation();
+            if (!confirm(`Удалить "${name}"?`)) return;
+            delete userSets[name];
+            if (currentSetName === name) {
+                currentFlashSet = null;
+                currentSetName = null;
+                currentFlashIndex = 0;
+                document.getElementById('flashFront').textContent = 'Выбери набор выше';
+                document.getElementById('flashBack').textContent = '';
+                document.getElementById('flashCounter').textContent = '0 / 0';
+            }
+            saveUserSets();
+            renderAll();
+            showToast(`🗑 "${name}" удалён`, 'success');
+        }
+
+        // ============ MATCH ============
+        function renderMatchSets() {
+            const container = document.getElementById('matchSetSelector');
+            const names = Object.keys(userSets);
+            if (names.length === 0) {
+                container.innerHTML = '<div style="color:var(--text-muted); text-align:center;">Нет наборов</div>';
+                return;
+            }
+            container.innerHTML = names.map(name => {
+                const isActive = selectedMatchSet === name ? 'active' : '';
+                return `<div class="set-wrapper" onclick="this.classList.toggle('touch-active')"><div class="set-pill ${isActive}" onclick="selectMatchSet('${escapeAttr(name)}')">${escapeHtml(name)}</div></div>`;
+            }).join('');
+        }
+
+        function selectMatchSet(name) {
+            selectedMatchSet = name;
+            renderMatchSets();
+        }
+
+        function initMatchGame() {
+            if (!selectedMatchSet || !userSets[selectedMatchSet]) { showToast('Выбери набор', 'error'); return; }
+            const cards = userSets[selectedMatchSet];
+            if (cards.length < 2) { showToast('Минимум 2 карточки', 'error'); return; }
+
+            const shuffled = [...cards].sort(() => Math.random()-0.5).slice(0, 6);
+            matchState.cards = [];
+            shuffled.forEach((c, i) => {
+                matchState.cards.push({ id: i, text: c.front, type: 'q', pairId: i });
+                matchState.cards.push({ id: i+100, text: c.back, type: 'a', pairId: i });
+            });
+            matchState.cards.sort(() => Math.random()-0.5);
+            matchState.selected = null;
+            matchState.matched = 0;
+            matchState.errors = 0;
+            matchState.startTime = Date.now();
+            clearInterval(matchState.timer);
+            matchState.timer = setInterval(updateMatchTimer, 1000);
+            renderMatchGrid();
+        }
+
+        function updateMatchTimer() {
+            const e = Math.floor((Date.now()-matchState.startTime)/1000);
+            document.getElementById('matchTime').textContent = `${Math.floor(e/60)}:${(e%60).toString().padStart(2,'0')}`;
+        }
+
+        function renderMatchGrid() {
+            const grid = document.getElementById('matchGrid');
+            grid.innerHTML = matchState.cards.map(c => `
+                <div class="match-card ${c.matched?'matched':''} ${matchState.selected?.id===c.id?'selected':''}" onclick="selectMatchCard(${c.id})">${c.text}</div>
+            `).join('');
+            document.getElementById('matchPairs').textContent = matchState.matched;
+            document.getElementById('matchErrors').textContent = matchState.errors;
+        }
+
+        function selectMatchCard(id) {
+            const c = matchState.cards.find(x => x.id === id);
+            if (!c || c.matched) return;
+            if (!matchState.selected) { matchState.selected = c; renderMatchGrid(); return; }
+            if (matchState.selected.id === id) { matchState.selected = null; renderMatchGrid(); return; }
+
+            if (matchState.selected.pairId === c.pairId && matchState.selected.type !== c.type) {
+                c.matched = true;
+                matchState.cards.find(x=>x.id===matchState.selected.id).matched = true;
+                matchState.matched++;
+                matchState.selected = null;
+                if (matchState.matched === 6) { clearInterval(matchState.timer); setTimeout(()=>showToast('🎉 Победа!','success'), 300); }
+            } else {
+                matchState.errors++;
+                const wids = [matchState.selected.id, id];
+                matchState.selected = null;
+                renderMatchGrid();
+                setTimeout(()=>{
+                    wids.forEach(wid => {
+                        const el = document.querySelector(`.match-card[onclick="selectMatchCard(${wid})"]`);
+                        if (el) { el.classList.add('wrong'); setTimeout(()=>el.classList.remove('wrong'), 400); }
+                    });
+                }, 10);
+            }
+            setTimeout(renderMatchGrid, 300);
+        }
+
+        // ============ SURVIVAL ============
+        function renderSurvivalSets() {
+            const container = document.getElementById('survivalSetSelector');
+            const names = Object.keys(userSets);
+            if (names.length === 0) {
+                container.innerHTML = '<div style="color:var(--text-muted); text-align:center;">Нет наборов</div>';
+                return;
+            }
+            container.innerHTML = names.map(name => {
+                const isActive = selectedSurvivalSet === name ? 'active' : '';
+                return `<div class="set-wrapper" onclick="this.classList.toggle('touch-active')"><div class="set-pill ${isActive}" onclick="selectSurvivalSet('${escapeAttr(name)}')">${escapeHtml(name)}</div></div>`;
+            }).join('');
+        }
+
+        function selectSurvivalSet(name) {
+            selectedSurvivalSet = name;
+            renderSurvivalSets();
+        }
+
+        function startSurvival() {
+            if (!selectedSurvivalSet || !userSets[selectedSurvivalSet]) { showToast('Выбери набор', 'error'); return; }
+            if (userSets[selectedSurvivalSet].length < 2) { showToast('Минимум 2 карточки', 'error'); return; }
+
+            survivalState = {
+                active: true,
+                cards: [...userSets[selectedSurvivalSet]],
+                lives: 3, maxLives: 3,
+                score: 0, streak: 0, bestStreak: 0,
+                level: 1
+            };
+            renderSurvivalHUD();
+            nextSurvivalCard();
+        }
+
+        function renderSurvivalHUD() {
+            const hearts = Array(survivalState.maxLives).fill(0).map((_,i)=>`<span class="heart ${i>=survivalState.lives?'lost':''}">❤️</span>`).join('');
+            document.getElementById('survivalGameArea').innerHTML = `
+                <div class="survival-hud">
+                    <div class="lives-display">${hearts}</div>
+                    <div style="text-align:center"><div class="level-number">${survivalState.level}</div><div class="level-label">Уровень</div></div>
+                    <div style="text-align:center"><div class="streak-number">${survivalState.streak}</div><div class="streak-label">Серия</div></div>
+                    <div style="text-align:center"><div class="streak-number">${survivalState.score}</div><div class="level-label">Очки</div></div>
+                </div>
+                <div class="survival-card" id="survivalCard" onclick="flipSurvivalCard()">
+                    <div class="survival-card-inner">
+                        <div class="survival-card-face survival-card-front"><div class="flash-label">Вопрос</div><div class="survival-text" id="survivalFront">—</div><div class="flash-hint">Нажми для ответа</div></div>
+                        <div class="survival-card-face survival-card-back"><div class="flash-label">Ответ</div><div class="survival-text" id="survivalBack">—</div><div class="flash-hint">Знаешь или нет?</div></div>
+                    </div>
+                </div>
+                <div class="survival-controls">
+                    <button class="survival-btn wrong" onclick="survivalAnswer(false)">✗ Не знаю</button>
+                    <button class="survival-btn correct" onclick="survivalAnswer(true)">✓ Знаю</button>
+                </div>
+            `;
+        }
+
+        function nextSurvivalCard() {
+            if (!survivalState.active) return;
+            const idx = Math.floor(Math.random()*survivalState.cards.length);
+            survivalState.currentCard = survivalState.cards[idx];
+            document.getElementById('survivalFront').textContent = survivalState.currentCard.front;
+            document.getElementById('survivalBack').textContent = survivalState.currentCard.back;
+            document.getElementById('survivalCard').classList.remove('flipped');
+        }
+
+        function flipSurvivalCard() { if (survivalState.active) document.getElementById('survivalCard').classList.toggle('flipped'); }
+
+        function survivalAnswer(correct) {
+            if (!survivalState.active) return;
+            if (correct) {
+                survivalState.score++;
+                survivalState.streak++;
+                if (survivalState.streak > survivalState.bestStreak) survivalState.bestStreak = survivalState.streak;
+                if (survivalState.lives < survivalState.maxLives) { survivalState.lives++; showToast('❤️ +1 жизнь','success'); }
+                const nl = Math.floor(survivalState.score/10)+1;
+                if (nl > survivalState.level) { survivalState.level = nl; showToast(` Уровень ${nl}!`,'success'); }
+                addToDailyGoal();
+            } else {
+                survivalState.lives--;
+                survivalState.streak = 0;
+                if (survivalState.lives <= 0) { gameOver(); return; }
+                showToast('💔 -1 жизнь','error');
+            }
+            renderSurvivalHUD();
+            setTimeout(nextSurvivalCard, 400);
+        }
+
+        function gameOver() {
+            survivalState.active = false;
+            document.getElementById('survivalGameArea').innerHTML = `
+                <div class="survival-gameover">
+                    <div class="gameover-title">💀 GAME OVER</div>
+                    <div style="color:var(--text-secondary); margin-bottom:20px;">Ты продержался ${survivalState.score} карточек!</div>
+                    <div class="match-stats">
+                        <div class="match-stat"><div class="gameover-stat-value">${survivalState.score}</div><div class="match-stat-label">Очков</div></div>
+                        <div class="match-stat"><div class="gameover-stat-value">${survivalState.level}</div><div class="match-stat-label">Уровень</div></div>
+                        <div class="match-stat"><div class="gameover-stat-value">${survivalState.bestStreak}</div><div class="match-stat-label">Лучшая серия</div></div>
+                    </div>
+                    <button class="btn primary" onclick="startSurvival()" style="margin-top:20px;"> Играть снова</button>
+                </div>
+            `;
+        }
+
+        // ============ FILE UPLOAD ============
+        function setupDragDrop() {
+            const area = document.getElementById('uploadArea');
+            area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('dragover'); });
+            area.addEventListener('dragleave', () => area.classList.remove('dragover'));
+            area.addEventListener('drop', e => { e.preventDefault(); area.classList.remove('dragover'); if (e.dataTransfer.files.length) processFile(e.dataTransfer.files[0]); });
+        }
+
+        function handleFileUpload(e) { if (e.target.files.length) processFile(e.target.files[0]); e.target.value = ''; }
+
+        function processFile(file) {
+            if (!file.name.endsWith('.json')) { showToast('Только JSON!', 'error'); return; }
+            const r = new FileReader();
+            r.onload = e => {
+                try {
+                    const d = JSON.parse(e.target.result);
+                    let ns;
+                    if (Array.isArray(d)) ns = { id:'user-'+Date.now(), title:file.name.replace('.json',''), category:'Пользовательские', desc:'Импорт', tags:['импорт'], cards:d };
+                    else if (d.cards) ns = { id:'user-'+Date.now(), title:d.name||file.name.replace('.json',''), category:d.category||'Пользовательские', desc:d.desc||'Импорт', tags:d.tags||[], cards:d.cards };
+                    else throw new Error('Неверный формат');
+                    if (!ns.cards.every(c=>c.front&&c.back)) throw new Error('Нужны front и back');
+                    library.push(ns);
+                    saveLibrary();
+                    renderAll();
+                    showToast(`✅ "${ns.title}" добавлен!`, 'success');
+                } catch(err) { showToast('Ошибка: '+err.message, 'error'); }
+            };
+            r.readAsText(file);
+        }
+
+        // ============ CREATE ============
+        let cardFields = [];
+        function addCardField() {
+            const c = document.getElementById('cardsContainer');
+            const id = Date.now();
+            cardFields.push(id);
+            const d = document.createElement('div');
+            d.id = 'card-'+id;
+            d.style.cssText = 'display:flex; gap:8px; margin-bottom:8px; animation:fadeIn 0.3s; flex-wrap:wrap;';
+            d.innerHTML = `<input type="text" class="input" id="q-${id}" placeholder="Вопрос" style="flex:1; min-width:150px; margin-bottom:0;"><input type="text" class="input" id="a-${id}" placeholder="Ответ" style="flex:1; min-width:150px; margin-bottom:0;"><button onclick="removeCardField(${id})" style="background:var(--danger); border:none; color:white; width:36px; border-radius:8px; cursor:pointer; font-size:16px;">×</button>`;
+            c.appendChild(d);
+        }
+
+        function removeCardField(id) {
+            const el = document.getElementById('card-'+id);
+            if (el) el.remove();
+            cardFields = cardFields.filter(f => f !== id);
+        }
+
+        function createAndPublishSet() {
+            const name = document.getElementById('newSetName').value.trim();
+            const cat = document.getElementById('newSetCategory').value;
+            const tags = document.getElementById('newSetTags').value.split(',').map(t=>t.trim()).filter(t=>t);
+            const desc = document.getElementById('newSetDesc').value.trim();
+            if (!name) { showToast('Введи название', 'error'); return; }
+            const cards = [];
+            cardFields.forEach(id => {
+                const q = document.getElementById('q-'+id).value.trim();
+                const a = document.getElementById('a-'+id).value.trim();
+                if (q && a) cards.push({ front:q, back:a });
+            });
+            if (cards.length === 0) { showToast('Добавь карточки', 'error'); return; }
+            const ns = { id:'user-'+Date.now(), title:name, category:cat, tags, desc:desc||'Пользовательский', cards, author:'SL Cards' };
+            library.push(ns);
+            userSets[name] = cards;
+            saveLibrary(); saveUserSets();
+            renderAll();
+            document.getElementById('newSetName').value = '';
+            document.getElementById('newSetDesc').value = '';
+            document.getElementById('newSetTags').value = '';
+            document.getElementById('cardsContainer').innerHTML = '';
+            cardFields = [];
+            showToast('🎉 Набор опубликован!', 'success');
+        }
+
+        // ============ UI ============
+        function showSection(name) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+            document.getElementById(name+'Section').classList.add('active');
+            document.getElementById(name+'Btn').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-theme');
+            localStorage.setItem('slCardsTheme', document.body.classList.contains('light-theme')?'light':'dark');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        function showToast(msg, type='info') {
+            const t = document.createElement('div');
+            t.className = 'toast '+type;
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(()=>{ t.style.opacity='0'; setTimeout(()=>t.remove(), 300); }, 2500);
+        }
+
+        function debounce(fn, w) { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), w); }; }
+
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function escapeAttr(s) { return String(s).replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+        // Keyboard
+        document.addEventListener('keydown', e => {
+            if (e.target.tagName==='INPUT' || e.target.tagName==='TEXTAREA' || e.target.tagName==='SELECT') return;
+            if (e.code==='Space') { e.preventDefault(); if (survivalState.active) flipSurvivalCard(); else flipFlashCard(); }
+            else if (e.code==='ArrowRight') { if (survivalState.active) survivalAnswer(true); else nextFlashCard(); }
+            else if (e.code==='ArrowLeft') { if (survivalState.active) survivalAnswer(false); else prevFlashCard(); }
+        });
+
+        document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => { if (e.target===m) m.classList.remove('active'); }));
+
+        init();
+    </script>
+</body>
+</html>

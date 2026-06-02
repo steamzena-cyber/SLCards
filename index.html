@@ -84,7 +84,6 @@
             100% { opacity: 0; transform: translateY(-100vh) scale(1.5); }
         }
 
-        /* ===== NAV ===== */
         nav {
             position: fixed;
             top: 0; width: 100%;
@@ -148,7 +147,6 @@
 
         .light-theme .theme-toggle::after { left: 22px; }
 
-        /* ===== CONTAINER ===== */
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -184,7 +182,7 @@
             letter-spacing: 1px;
         }
 
-        /* ===== SET PILLS ===== */
+        /* ===== SET PILLS (ИСПРАВЛЕНО) ===== */
         .set-selector {
             display: flex;
             flex-wrap: wrap;
@@ -223,6 +221,7 @@
             font-weight: 700;
         }
 
+        /* Кнопки действий на наборах */
         .set-action {
             position: absolute;
             width: 28px; height: 28px;
@@ -243,18 +242,34 @@
         .set-wrapper:hover .set-action,
         .set-wrapper.touch-active .set-action { opacity: 1; }
 
+        /* ↓ Скачать — СЛЕВА */
         .set-action.download {
-            top: -10px; left: 50%;
-            transform: translateX(-50%);
+            top: -10px;
+            left: -5px;
             background: var(--success);
         }
 
+        /* ✏ Редактировать — ПО ЦЕНТРУ СВЕРХУ */
+        .set-action.edit {
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--info);
+        }
+
+        .set-wrapper:hover .set-action.edit {
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* × Удалить — СПРАВА */
         .set-action.delete {
-            top: -10px; right: -5px;
+            top: -10px;
+            right: -5px;
             background: var(--danger);
         }
 
         .set-action:hover { transform: scale(1.15); }
+        .set-action.edit:hover { transform: translateX(-50%) scale(1.15); }
 
         /* ===== FLASH CARD ===== */
         .flash-card {
@@ -718,6 +733,8 @@
 
         .btn:hover { border-color: var(--border-hover); transform: translateY(-2px); }
         .btn.primary { background: var(--accent); color: var(--bg-primary); border-color: var(--accent); }
+        .btn.danger { background: var(--danger); color: white; border-color: var(--danger); }
+        .btn.info { background: var(--info); color: white; border-color: var(--info); }
 
         /* ===== MODAL ===== */
         .modal {
@@ -740,7 +757,7 @@
             border: 1px solid var(--border-color);
             border-radius: 22px;
             padding: 30px;
-            max-width: 550px;
+            max-width: 600px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
@@ -748,6 +765,63 @@
 
         .modal-title { font-size: 22px; margin-bottom: 20px; text-align: center; }
         .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap; }
+
+        /* ===== EDIT SET MODAL ===== */
+        .edit-card-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+            animation: fadeIn 0.3s;
+        }
+
+        .edit-card-row input {
+            flex: 1;
+            padding: 10px 14px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            min-width: 0;
+        }
+
+        .edit-card-row input:focus { border-color: var(--border-hover); }
+
+        .edit-card-row .remove-card-btn {
+            width: 32px; height: 32px;
+            background: var(--danger);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+
+        .edit-card-row .remove-card-btn:hover { transform: scale(1.1); }
+
+        .edit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .edit-header h3 {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .cards-list-edit {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
 
         /* ===== TOAST ===== */
         .toast {
@@ -772,107 +846,35 @@
         .toast.success { border-left: 4px solid var(--success); }
         .toast.error { border-left: 4px solid var(--danger); }
 
-        /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-primary); }
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
 
-        /* ===== MOBILE ADAPTIVE ===== */
         @media (max-width: 768px) {
-            nav {
-                padding: 12px 15px;
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-
+            nav { padding: 12px 15px; flex-wrap: wrap; gap: 10px; }
             .logo { font-size: 20px; }
-
-            .nav-links {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 6px;
-                width: 100%;
-                order: 3;
-            }
-
-            .nav-links button {
-                font-size: 11px;
-                padding: 7px 10px;
-            }
-
+            .nav-links { flex-wrap: wrap; justify-content: center; gap: 6px; width: 100%; order: 3; }
+            .nav-links button { font-size: 11px; padding: 7px 10px; }
             .container { padding: 130px 15px 30px; }
-
-            .header h1 {
-                font-size: 32px;
-                letter-spacing: 4px;
-            }
-
+            .header h1 { font-size: 32px; letter-spacing: 4px; }
             .subtitle { font-size: 13px; }
-
-            .set-pill {
-                padding: 11px 20px;
-                font-size: 13px;
-            }
-
-            .flash-card {
-                height: 320px;
-                margin: 20px auto;
-            }
-
+            .set-pill { padding: 11px 20px; font-size: 13px; }
+            .flash-card { height: 320px; margin: 20px auto; }
             .flash-text { font-size: 20px; }
             .flash-card-face { padding: 30px 20px; }
-
-            .control-btn {
-                padding: 10px 18px;
-                font-size: 13px;
-            }
-
-            .cards-grid {
-                grid-template-columns: 1fr;
-                gap: 12px;
-            }
-
+            .control-btn { padding: 10px 18px; font-size: 13px; }
+            .cards-grid { grid-template-columns: 1fr; gap: 12px; }
             .card-item { padding: 18px; }
-
-            .daily-goal {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .search-filter {
-                flex-direction: column;
-            }
-
-            .search-input, .filter-select {
-                width: 100%;
-            }
-
-            .match-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-
-            .match-card {
-                padding: 15px 10px;
-                font-size: 12px;
-                min-height: 75px;
-            }
-
-            .survival-hud {
-                justify-content: center;
-                text-align: center;
-            }
-
+            .daily-goal { flex-direction: column; text-align: center; }
+            .search-filter { flex-direction: column; }
+            .search-input, .filter-select { width: 100%; }
+            .match-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .match-card { padding: 15px 10px; font-size: 12px; min-height: 75px; }
+            .survival-hud { justify-content: center; text-align: center; }
             .survival-card { height: 300px; }
             .survival-text { font-size: 20px; }
-
-            .survival-btn {
-                padding: 12px 24px;
-                font-size: 14px;
-            }
-
+            .survival-btn { padding: 12px 24px; font-size: 14px; }
             .gameover-title { font-size: 32px; }
-
             .modal-content { padding: 25px 20px; }
         }
 
@@ -913,7 +915,7 @@
 
             <div class="daily-goal">
                 <div class="daily-goal-info">
-                    <h3>🎯 Ежедневная цель</h3>
+                    <h3> Ежедневная цель</h3>
                     <p>Установи свою цель</p>
                     <div class="goal-setting">
                         <input type="number" class="goal-input" id="goalInput" min="5" max="100" value="20">
@@ -1065,7 +1067,7 @@
                         <div id="cardsContainer"></div>
                     </div>
 
-                    <button class="btn primary" style="width: 100%; padding: 14px;" onclick="createAndPublishSet()"> Опубликовать</button>
+                    <button class="btn primary" style="width: 100%; padding: 14px;" onclick="createAndPublishSet()">🚀 Опубликовать</button>
                 </div>
             </div>
         </div>
@@ -1079,6 +1081,26 @@
             <div class="modal-actions">
                 <button class="btn" onclick="closeModal('previewModal')">Закрыть</button>
                 <button class="btn primary" id="addToLibBtn">Добавить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Set Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-title">✏️ Редактировать набор</div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; color: var(--text-secondary); text-transform: uppercase;">Название набора</label>
+                <input type="text" class="input" id="editSetName" placeholder="Новое название">
+            </div>
+            <div class="edit-header">
+                <h3>Карточки набора</h3>
+                <button class="btn info" onclick="addEditCardField()" style="padding: 6px 14px; font-size: 12px;">+ Добавить</button>
+            </div>
+            <div class="cards-list-edit" id="editCardsList"></div>
+            <div class="modal-actions">
+                <button class="btn danger" onclick="closeModal('editModal')">Отмена</button>
+                <button class="btn primary" onclick="saveEditSet()">💾 Сохранить</button>
             </div>
         </div>
     </div>
@@ -1208,6 +1230,10 @@
         let dailyGoal = { target: 20, completed: 0, date: null };
         let matchState = { cards: [], selected: null, matched: 0, errors: 0, timer: null, startTime: null };
         let survivalState = { active: false, cards: [], lives: 3, maxLives: 3, score: 0, streak: 0, bestStreak: 0, level: 1 };
+
+        // Edit state
+        let editingSetName = null;
+        let editingCards = [];
 
         // ============ INIT ============
         function init() {
@@ -1366,7 +1392,7 @@
             showToast(`"${s.title}" добавлен`, 'success');
         }
 
-        // ============ FLASH SETS ============
+        // ============ FLASH SETS (ИСПРАВЛЕНО: ↓ СЛЕВА, ✏ ПО ЦЕНТРУ, × СПРАВА) ============
         function renderFlashSets() {
             const container = document.getElementById('flashSetSelector');
             const names = Object.keys(userSets);
@@ -1383,10 +1409,95 @@
                     <div class="set-wrapper" onclick="this.classList.toggle('touch-active')">
                         <div class="set-pill ${isActive}" onclick="loadFlashSet('${escapeAttr(name)}')">${escapeHtml(name)} (${count})</div>
                         <div class="set-action download" onclick="downloadSet('${escapeAttr(name)}', event)" title="Скачать">↓</div>
+                        <div class="set-action edit" onclick="openEditModal('${escapeAttr(name)}', event)" title="Редактировать">✏</div>
                         <div class="set-action delete" onclick="deleteSet('${escapeAttr(name)}', event)" title="Удалить">×</div>
                     </div>
                 `;
             }).join('');
+        }
+
+        // ============ EDIT SET ============
+        function openEditModal(name, event) {
+            if (event) event.stopPropagation();
+            if (!userSets[name]) return;
+            
+            editingSetName = name;
+            editingCards = userSets[name].map(c => ({...c}));
+            
+            document.getElementById('editSetName').value = name;
+            renderEditCards();
+            openModal('editModal');
+        }
+
+        function renderEditCards() {
+            const list = document.getElementById('editCardsList');
+            if (editingCards.length === 0) {
+                list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">Нет карточек. Добавь первую!</div>';
+                return;
+            }
+            
+            list.innerHTML = editingCards.map((card, i) => `
+                <div class="edit-card-row">
+                    <input type="text" placeholder="Вопрос" value="${escapeHtml(card.front)}" onchange="updateEditCard(${i}, 'front', this.value)">
+                    <input type="text" placeholder="Ответ" value="${escapeHtml(card.back)}" onchange="updateEditCard(${i}, 'back', this.value)">
+                    <button class="remove-card-btn" onclick="removeEditCard(${i})">×</button>
+                </div>
+            `).join('');
+        }
+
+        function addEditCardField() {
+            editingCards.push({ front: '', back: '' });
+            renderEditCards();
+            // Прокрутить вниз
+            const list = document.getElementById('editCardsList');
+            list.scrollTop = list.scrollHeight;
+        }
+
+        function updateEditCard(index, field, value) {
+            editingCards[index][field] = value;
+        }
+
+        function removeEditCard(index) {
+            editingCards.splice(index, 1);
+            renderEditCards();
+        }
+
+        function saveEditSet() {
+            const newName = document.getElementById('editSetName').value.trim();
+            if (!newName) {
+                showToast('Введи название', 'error');
+                return;
+            }
+            
+            // Удалить пустые карточки
+            const validCards = editingCards.filter(c => c.front.trim() && c.back.trim());
+            
+            if (validCards.length === 0) {
+                showToast('Добавь хотя бы одну карточку', 'error');
+                return;
+            }
+            
+            // Если имя изменилось — удалить старый набор
+            if (newName !== editingSetName) {
+                delete userSets[editingSetName];
+                if (currentSetName === editingSetName) {
+                    currentSetName = newName;
+                }
+            }
+            
+            userSets[newName] = validCards;
+            saveUserSets();
+            
+            // Обновить текущий набор если он редактировался
+            if (currentSetName === newName || currentSetName === editingSetName) {
+                currentFlashSet = validCards.map(c => ({...c}));
+                currentFlashIndex = 0;
+                showFlashCard();
+            }
+            
+            renderAll();
+            closeModal('editModal');
+            showToast(`✅ "${newName}" сохранён (${validCards.length} карт.)`, 'success');
         }
 
         function loadFlashSet(name) {
@@ -1618,7 +1729,7 @@
                 if (survivalState.streak > survivalState.bestStreak) survivalState.bestStreak = survivalState.streak;
                 if (survivalState.lives < survivalState.maxLives) { survivalState.lives++; showToast('❤️ +1 жизнь','success'); }
                 const nl = Math.floor(survivalState.score/10)+1;
-                if (nl > survivalState.level) { survivalState.level = nl; showToast(` Уровень ${nl}!`,'success'); }
+                if (nl > survivalState.level) { survivalState.level = nl; showToast(`Уровень ${nl}!`,'success'); }
                 addToDailyGoal();
             } else {
                 survivalState.lives--;
@@ -1641,7 +1752,7 @@
                         <div class="match-stat"><div class="gameover-stat-value">${survivalState.level}</div><div class="match-stat-label">Уровень</div></div>
                         <div class="match-stat"><div class="gameover-stat-value">${survivalState.bestStreak}</div><div class="match-stat-label">Лучшая серия</div></div>
                     </div>
-                    <button class="btn primary" onclick="startSurvival()" style="margin-top:20px;"> Играть снова</button>
+                    <button class="btn primary" onclick="startSurvival()" style="margin-top:20px;">Играть снова</button>
                 </div>
             `;
         }
